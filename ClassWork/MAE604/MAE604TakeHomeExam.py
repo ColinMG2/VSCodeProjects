@@ -117,7 +117,7 @@ z1 = m0/m1
 z2 = m1/m2
 z3 = m2/m3
 
-c = 9.81  # [m/s^2]
+c = 2500  # [m/s^2]
 delta_v1 = 2*c*np.log(z1)
 delta_v2 = 2*c*np.log(z2)
 delta_v3 = 2*c*np.log(z3)
