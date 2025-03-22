@@ -81,7 +81,7 @@ plt.legend()
 plt.show()
 
 print('Question 2:\n')
-print('Based on the plot, it is not possible for any of the planets in the solar system to pass through one (or more) of each others Lagrange points.\n')
+print('Based on the plot, it is not possible for any of the planets in the solar system to pass through one (or more) of each others Lagrange points. Even though L4 and L5 were not plotted for the planets, since L4 and L5 lay on the planets orbit, a different planet in the solar system would not be able to get caught in it.\n')
 
 # Question 3
 print('Question 3:\n')
