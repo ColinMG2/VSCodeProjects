@@ -2,7 +2,6 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from threading import Thread
 from ultralytics.engine.results import Keypoints
 
@@ -44,7 +43,7 @@ if __name__ == '__main__':
 
     # Create a process for each model
     thread1 = Thread(target=run_model, args=('yolomodels/best.pt', 'results_best', input_source, False))
-    thread2 = Thread(target=run_model, args=('yolomodels/yolo11m-pose.pt', 'results_pose', input_source, True))
+    thread2 = Thread(target=run_model, args=('yolomodels/yolo11n-pose.pt', 'results_pose', input_source, True))
 
     # Start the processes
     thread1.start()
