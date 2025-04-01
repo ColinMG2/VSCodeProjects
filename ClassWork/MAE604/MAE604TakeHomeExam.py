@@ -96,8 +96,8 @@ mu_moon = G*M_moon # [km^3/s^2]
 v_sp = np.sqrt(mu_moon/(r_moon + h_moon)) # [km/s]
 T_sp = 2*np.pi*np.sqrt((r_moon + h_moon)**3/mu_moon) # [s]
 print('Problem 1:\n')
-print(f'Velocity of spacecraft in circular orbit around Moon: {v_sp} [km/s]')
-print(f'Period of spacecraft in circular orbit around Moon: {T_sp} [s]\n')
+print(f'Velocity of spacecraft in circular orbit around Moon: {v_sp:.2f} [km/s]')
+print(f'Period of spacecraft in circular orbit around Moon: {T_sp:.2f} [s]\n')
 
 # Problem 2
 # Parameters
@@ -146,6 +146,7 @@ r_vals = P/(1 + e*np.cos(f_vals))  # [km]
 x_vals = r_vals*np.cos(f_vals)  # [km]
 y_vals = r_vals*np.sin(f_vals)  # [km]
 print(f'(c) Position of spacecraft after 4.5 hours is ({x_vals[-1]:.2f}, {y_vals[-1]:.2f}) [km]\n    Angle from x-axis is {f_vals[-1]:.2f} [rad]\n')
+print(f'(c) Position using radius r = {r_vals[-1]:.2f} [km] and angle f = {f_vals[-1]:.2f} [rad]\n')
 
 theta = np.linspace(0, 2*np.pi, 500)
 r_orbit = P/(1 + e*np.cos(theta))

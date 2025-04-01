@@ -5,23 +5,34 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-model = YOLO ('yolomodels/yolo11n-pose.pt')
-results = model.predict(source='videos/shahriar_drowning.mp4', stream=True, device='cpu')
+video_path = input("Enter the path to the video file: ")
+model = YOLO ('yolomodels/yolo11s-pose.pt')
+results = model.predict(source=video_path, stream=True)
 
 cv2.namedWindow('Pose Detection', cv2.WINDOW_NORMAL)
 cv2.resizeWindow('Pose Detection', 800, 600)
 
-plt.ion()
-fig, ax = plt.subplots(figsize=(10, 5))
-ax.set_title('Right Knee Position')
-ax.set_xlabel('x')
-ax.set_ylabel('y')
-ax.grid()
-scatter_plot, = ax.plot([], [], 'ro', label='right knee')  # Initialize an empty scatter plot
-ax.legend()
+def plot_keypoints(df, keypoints_to_plot):
+    num_keypoints = len(keypoints_to_plot)
+    fig, axes = plt.subplots(num_keypoints, 1, figsize=(8, 6 * num_keypoints), sharex=True)
+    if num_keypoints == 1:
+        axes = [axes]
+    scatter_plots = {}
+    for ax, keypoint in zip(axes, keypoints_to_plot):
+        ax.set_title(f'{keypoint.capitalize()} Position')
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.grid()
+        scatter_plots[keypoint] = ax.plot([], [], 'o', label=keypoint)[0]
+        ax.legend()
 
-rk_x = []
-rk_y = []
+    plt.ion()
+    return fig, axes, scatter_plots
+
+keypoints_to_plot = ['right knee', 'right wrist', 'left knee', 'left wrist']
+fig, axes, scatter_plots = plot_keypoints(pd.DataFrame(), keypoints_to_plot)
+
+keypoint_data = {keypoint: {'x': [], 'y': []} for keypoint in keypoints_to_plot}
 
 for result in results:
     frame = result.plot()
@@ -31,22 +42,26 @@ for result in results:
         base_tensor = result.keypoints.data
         keypoints = Keypoints(base_tensor, orig_shape=frame.shape)
         normalized_keypoints = np.squeeze(keypoints.xyn.cpu().numpy())
-        if len(normalized_keypoints) == 3:
+        if len(normalized_keypoints.shape) == 3:
             normalized_keypoints = normalized_keypoints[0]
-        elif len(normalized_keypoints) == 2:
+        elif len(normalized_keypoints.shape) == 2:
             x_norm, y_norm = normalized_keypoints[:, 0], normalized_keypoints[:, 1]
             keypoints_data = {'keypoints': ['nose', 'left eye', 'right eye', 'left ear', 'right ear', 'left shoulder', 'right shoulder', 'left elbow', 'right elbow', 'left wrist', 'right wrist', 'left hip', 'right hip', 'left knee', 'right knee', 'left ankle', 'right ankle'] ,
                                       'x': x_norm,
                                       'y': y_norm}
             df = pd.DataFrame(keypoints_data)
-            right_knee_x = df.loc[df['keypoints'] == 'right knee', 'x'].values[0]   
-            right_knee_y = df.loc[df['keypoints'] == 'right knee', 'y'].values[0]
-            rk_x.append(right_knee_x)
-            rk_y.append(right_knee_y)
+            for keypoint in keypoints_to_plot:
+                keypoint_x = df.loc[df['keypoints'] == keypoint, 'x'].values[0]   
+                keypoint_y = df.loc[df['keypoints'] == keypoint, 'y'].values[0]
+                keypoint_data[keypoint]['x'].append(keypoint_x)
+                keypoint_data[keypoint]['y'].append(keypoint_y)
 
-        scatter_plot.set_data(rk_x, rk_y)  # Update the scatter plot with new data
-        ax.relim()
-        ax.autoscale_view()
+                scatter_plots[keypoint].set_data(keypoint_data[keypoint]['x'], keypoint_data[keypoint]['y'])
+
+        for ax in axes:
+            ax.relim()
+            ax.autoscale_view()
+        
         fig.canvas.draw()
         fig.canvas.flush_events()
         plt.pause(0.001)
