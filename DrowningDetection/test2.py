@@ -5,12 +5,15 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Load the YOLO model
 model = YOLO ('yolomodels/yolo11s-pose.pt')
 results = model.predict(source='videos/shahriar_drowning.mp4', stream=True)
 
+# Create smaller window for displaying yolo results
 cv2.namedWindow('Pose Detection', cv2.WINDOW_NORMAL)
 cv2.resizeWindow('Pose Detection', 800, 600)
 
+# Create function to plot x,y positions and FFT of keypoints
 def plot_keypoints(df, keypoints_to_plot):
     num_keypoints = len(keypoints_to_plot)
     fig, axes = plt.subplots(num_keypoints, 2, figsize=(10, 4 * num_keypoints))
@@ -38,11 +41,14 @@ def plot_keypoints(df, keypoints_to_plot):
     plt.ion()
     return fig, axes, scatter_plots
 
+# Store keypoints that you want to plot in string list
 keypoints_to_plot = ['right knee', 'right ankle', 'left knee', 'left ankle']
 fig, axes, scatter_plots = plot_keypoints(pd.DataFrame(), keypoints_to_plot)
 
+# Initialize a dictionary to store keypoint data
 keypoint_data = {keypoint: {'x': [], 'y': []} for keypoint in keypoints_to_plot}
 
+# Loop through the results and extract keypoints
 for frame_idx, result in enumerate(results):
     frame = result.plot()
     cv2.imshow('Pose Detection', frame)
@@ -83,9 +89,9 @@ for frame_idx, result in enumerate(results):
                     fft_y = np.abs(fft_y) / np.max(np.abs(fft_y))
                     fft_x = 20 * np.log10(fft_x)
                     fft_y = 20 * np.log10(fft_y)
-                    freq = np.fft.fftfreq(len(keypoint_data[keypoint]['x']))   # Assuming a sample rate of 1 Hz for simplicity  
+                    freq = np.fft.fftfreq(len(keypoint_data[keypoint]['x']))
                     freq = freq[:len(freq) // 2]  # Take only the positive frequencies
-    
+
                     frame_array = np.arange(1, len(keypoint_data[keypoint]['x']) + 1)
 
                     for i in range(len(keypoints_to_plot)):
