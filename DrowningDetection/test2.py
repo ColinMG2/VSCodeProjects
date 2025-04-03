@@ -22,7 +22,7 @@ def plot_keypoints(df, keypoints_to_plot):
     scatter_plots = {}
     for i, keypoint in enumerate(keypoints_to_plot):
         axes[i][0].set_title(f'{keypoint.capitalize()} change over time')
-        axes[i][0].set_xlabel('time (frame)')
+        axes[i][0].set_xlabel('time (frames)')
         axes[i][0].set_ylabel('X, Y position')
         axes[i][0].grid()
         scatter_plots[f'{keypoint}_x'] = axes[i][0].plot([], [], 'o-', label=f'{keypoint} x')[0]
@@ -42,7 +42,7 @@ def plot_keypoints(df, keypoints_to_plot):
     return fig, axes, scatter_plots
 
 # Store keypoints that you want to plot in string list
-keypoints_to_plot = ['right knee', 'right ankle', 'left knee', 'left ankle']
+keypoints_to_plot = ['right ankle', 'left ankle']
 fig, axes, scatter_plots = plot_keypoints(pd.DataFrame(), keypoints_to_plot)
 
 # Initialize a dictionary to store keypoint data
@@ -83,16 +83,14 @@ for frame_idx, result in enumerate(results):
                     keypoint_data[keypoint]['x'].append(keypoint_x)
                     keypoint_data[keypoint]['y'].append(keypoint_y)
 
-                    fft_x = np.fft.fft(keypoint_data[keypoint]['x'])
-                    fft_y = np.fft.fft(keypoint_data[keypoint]['y'])
-                    fft_x = np.abs(fft_x) / np.max(np.abs(fft_x))
-                    fft_y = np.abs(fft_y) / np.max(np.abs(fft_y))
-                    fft_x = 20 * np.log10(fft_x)
-                    fft_y = 20 * np.log10(fft_y)
-                    freq = np.fft.fftfreq(len(keypoint_data[keypoint]['x']))
-                    freq = freq[:len(freq) // 2]  # Take only the positive frequencies
-
+                    # Create an array of frame numbers
                     frame_array = np.arange(1, len(keypoint_data[keypoint]['x']) + 1)
+
+                    # Calculate FFT for x and y coordinates
+                    fft_x = 20 * np.log10(np.abs(np.fft.fft(keypoint_data[keypoint]['x'])))
+                    fft_y = 20 * np.log10(np.abs(np.fft.fft(keypoint_data[keypoint]['y'])))
+                    freq = np.fft.fftfreq(len(keypoint_data[keypoint]['x']))
+                    freq = freq[:len(frame_array) // 2]  # Take only the positive frequencies
 
                     for i in range(len(keypoints_to_plot)):
                         if len(frame_array) == len(keypoint_data[keypoints_to_plot[i]]['x']):
@@ -105,7 +103,6 @@ for frame_idx, result in enumerate(results):
                             axes[i][0].autoscale_view()
                             axes[i][1].relim()
                             axes[i][1].autoscale_view()
-
 
         fig.canvas.draw()
         fig.canvas.flush_events()
