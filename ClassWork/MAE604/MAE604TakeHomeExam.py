@@ -118,7 +118,8 @@ print(f'(a) Time it takes to get from point P to point A is {(t[2]-t[0])/3600:.2
 print(f'(b) Time it takes to get from point B to point D is {(t[3]-t[1])/3600:.2f} [hours]')
 
 # Calculating mean anomaly for t = 4.5 hours
-M_i = n * 4.5 * 3600 # initial guess for mean anomaly [rad]
+M_i = n * 4.5 * 3600 # initial guess for mean anomaly [rad
+print(f'(c) Mean anomaly is {M_i:.2f} [rad]')
 def g(M, E, e):
     return M - (E - e*np.sin(E))
 

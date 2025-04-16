@@ -1,8 +1,5 @@
 from ultralytics import YOLO
 import cv2
-import numpy as np
-import pandas as pd
-from ultralytics.engine.results import Keypoints
 
 input_source = 'videos/IMG_8314.mp4'
 cap = cv2.VideoCapture(input_source)

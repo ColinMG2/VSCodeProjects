@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 # Load the YOLO model
 model = YOLO ('yolomodels/yolo11s-pose.pt')
-results = model.predict(source='videos/shahriar_drowning.mp4', stream=True)
+results = model.predict(source='videos/shahriar_floating.mp4', stream=True)
 
 # Create smaller window for displaying yolo results
 cv2.namedWindow('Pose Detection', cv2.WINDOW_NORMAL)
@@ -16,7 +16,7 @@ cv2.resizeWindow('Pose Detection', 800, 600)
 # Create function to plot x,y positions and FFT of keypoints
 def plot_keypoints(df, keypoints_to_plot):
     num_keypoints = len(keypoints_to_plot)
-    fig, axes = plt.subplots(num_keypoints, 2, figsize=(10, 4 * num_keypoints))
+    fig, axes = plt.subplots(num_keypoints, 2, figsize=(8, 4), sharex='col')
     if num_keypoints == 1:
         axes = [axes]
     scatter_plots = {}
@@ -28,16 +28,15 @@ def plot_keypoints(df, keypoints_to_plot):
         scatter_plots[f'{keypoint}_x'] = axes[i][0].plot([], [], 'o-', label=f'{keypoint} x')[0]
         scatter_plots[f'{keypoint}_y'] = axes[i][0].plot([], [], 'o-', label=f'{keypoint} y')[0]
         axes[i][0].legend()
-
+        
         axes[i][1].set_title(f'{keypoint.capitalize()} FFT over time')
         axes[i][1].set_xlabel('Frequency (Hz)')
         axes[i][1].set_ylabel('Magnitude')
         axes[i][1].grid()
-        scatter_plots[f'{keypoint}_fft_x'] = axes[i][1].plot([], [], 'o-', label=f'{keypoint} x FFT')[0]
-        scatter_plots[f'{keypoint}_fft_y'] = axes[i][1].plot([], [], 'o-', label=f'{keypoint} y FFT')[0]
+        scatter_plots[f'{keypoint}_fft_x'] = axes[i][1].plot([], [], 'o', label=f'{keypoint} x FFT')[0]
+        scatter_plots[f'{keypoint}_fft_y'] = axes[i][1].plot([], [], 'o', label=f'{keypoint} y FFT')[0]
         axes[i][1].legend()
-
-
+    
     plt.ion()
     return fig, axes, scatter_plots
 
@@ -90,7 +89,7 @@ for frame_idx, result in enumerate(results):
                     fft_x = 20 * np.log10(np.abs(np.fft.fft(keypoint_data[keypoint]['x'])))
                     fft_y = 20 * np.log10(np.abs(np.fft.fft(keypoint_data[keypoint]['y'])))
                     freq = np.fft.fftfreq(len(keypoint_data[keypoint]['x']))
-                    freq = freq[:len(frame_array) // 2]  # Take only the positive frequencies
+                    freq = freq[:len(frame_array) // 2]
 
                     for i in range(len(keypoints_to_plot)):
                         if len(frame_array) == len(keypoint_data[keypoints_to_plot[i]]['x']):
@@ -112,5 +111,6 @@ for frame_idx, result in enumerate(results):
             break
 
 plt.ioff()
+plt.tight_layout()
 plt.show()
 cv2.destroyAllWindows()
