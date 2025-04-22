@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 # Load the YOLO model
 model = YOLO ('yolomodels/yolo11s-pose.pt')
-results = model.predict(source='videos/shahriar_floating.mp4', stream=True)
+results = model.predict(source='videos/shahriar_drowning.mp4', stream=True)
 
 # Create smaller window for displaying yolo results
 cv2.namedWindow('Pose Detection', cv2.WINDOW_NORMAL)
@@ -31,10 +31,10 @@ def plot_keypoints(df, keypoints_to_plot):
         
         axes[i][1].set_title(f'{keypoint.capitalize()} FFT over time')
         axes[i][1].set_xlabel('Frequency (Hz)')
-        axes[i][1].set_ylabel('Magnitude')
+        axes[i][1].set_ylabel('Magnitude (dB)')
         axes[i][1].grid()
-        scatter_plots[f'{keypoint}_fft_x'] = axes[i][1].plot([], [], 'o', label=f'{keypoint} x FFT')[0]
-        scatter_plots[f'{keypoint}_fft_y'] = axes[i][1].plot([], [], 'o', label=f'{keypoint} y FFT')[0]
+        scatter_plots[f'{keypoint}_fft_x'] = axes[i][1].plot([], [], 'o-', label=f'{keypoint} x FFT')[0]
+        scatter_plots[f'{keypoint}_fft_y'] = axes[i][1].plot([], [], 'o-', label=f'{keypoint} y FFT')[0]
         axes[i][1].legend()
     
     plt.ion()
